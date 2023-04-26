@@ -2,6 +2,8 @@ package net.torocraft.minecoprocessors.gui;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreenBook;
 import net.minecraft.client.renderer.GlStateManager;
@@ -231,7 +233,7 @@ public class GuiMinecoprocessor extends net.minecraft.client.gui.inventory.GuiCo
 
   private static String maxLength(String s, int l) {
     if (s.length() > l) {
-      return s.substring(s.length() - l, s.length());
+      return s.substring(s.length() - l);
     }
     return s;
   }
@@ -242,7 +244,7 @@ public class GuiMinecoprocessor extends net.minecraft.client.gui.inventory.GuiCo
     }
     String s = Integer.toHexString(b);
     if (s.length() > 2) {
-      return s.substring(s.length() - 2, s.length());
+      return s.substring(s.length() - 2);
     }
     return leftPad(s, 2);
   }
@@ -269,7 +271,7 @@ public class GuiMinecoprocessor extends net.minecraft.client.gui.inventory.GuiCo
     }
     String s = Integer.toHexString(b);
     if (s.length() > 4) {
-      return s.substring(s.length() - 4, s.length());
+      return s.substring(s.length() - 4);
     }
     return leftPad(s, 4);
   }
@@ -355,7 +357,7 @@ public class GuiMinecoprocessor extends net.minecraft.client.gui.inventory.GuiCo
   }
 
   private void drawGuiTitle() {
-    String s = minecoprocessor.getDisplayName().getUnformattedText();
+    String s = Objects.requireNonNull(minecoprocessor.getDisplayName()).getUnformattedText();
     fontRenderer.drawString(s, xSize / 2 - fontRenderer.getStringWidth(s) / 2, 6, 4210752);
   }
 
@@ -440,7 +442,7 @@ public class GuiMinecoprocessor extends net.minecraft.client.gui.inventory.GuiCo
         this.drawTexturedModalRect(i + 97, j + 16, 176, 0, 9, j1);
       }
 
-      j1 = 0;
+      //j1 = 0;
 
       if (j1 > 0) {
         this.drawTexturedModalRect(i + 63, j + 14 + 29 - j1, 185, 29 - j1, 12, j1);

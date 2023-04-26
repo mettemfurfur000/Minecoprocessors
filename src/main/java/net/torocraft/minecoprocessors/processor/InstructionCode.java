@@ -13,10 +13,6 @@ public enum InstructionCode {
   JMP,
   JZ,
   JNZ,
-  JG,
-  JL,
-  JGE,
-  JLE,
   JE,
   JNE,
   LOOP,
@@ -30,7 +26,6 @@ public enum InstructionCode {
   RET,
   CALL,
   NOP,
-  INT,
   WFE,
   INC,
   DEC,
@@ -45,6 +40,5 @@ public enum InstructionCode {
   CLZ,
   CLC,
   SEZ,
-  SEC,
-  DUMP
+  SEC
 }

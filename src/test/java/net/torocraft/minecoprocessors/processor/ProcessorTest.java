@@ -165,25 +165,25 @@ public class ProcessorTest {
   public void testTestOverFlow() {
     Processor processor = new Processor();
 
-    processor.testOverflow(1);
+    processor.checkOverflow(1);
     Assert.assertFalse(processor.overflow);
 
-    processor.testOverflow(1000);
+    processor.checkOverflow(1000);
     Assert.assertTrue(processor.overflow);
 
-    processor.testOverflow(128);
+    processor.checkOverflow(128);
     Assert.assertTrue(processor.overflow);
 
-    processor.testOverflow(127);
+    processor.checkOverflow(127);
     Assert.assertFalse(processor.overflow);
 
-    processor.testOverflow(-128);
+    processor.checkOverflow(-128);
     Assert.assertFalse(processor.overflow);
 
-    processor.testOverflow(-129);
+    processor.checkOverflow(-129);
     Assert.assertTrue(processor.overflow);
 
-    processor.testOverflow(129L);
+    processor.checkOverflow(129L);
     Assert.assertTrue(processor.overflow);
   }
 
@@ -494,30 +494,6 @@ public class ProcessorTest {
   }
 
   @Test
-  public void testProcessJg() throws ParseException {
-    Assert.assertTrue(willJump(Processor::processJg, false, false));
-    Assert.assertFalse(willJump(Processor::processJg, true, true));
-    Assert.assertFalse(willJump(Processor::processJg, true, true));
-    Assert.assertFalse(willJump(Processor::processJg, false, true));
-  }
-
-  @Test
-  public void testProcessJl() throws ParseException {
-    Assert.assertTrue(willJump(Processor::processJl, true, false));
-    Assert.assertFalse(willJump(Processor::processJl, true, true));
-    Assert.assertFalse(willJump(Processor::processJl, false, false));
-    Assert.assertFalse(willJump(Processor::processJl, false, true));
-  }
-
-  @Test
-  public void testProcessJle() throws ParseException {
-    Assert.assertTrue(willJump(Processor::processJle, true, true));
-    Assert.assertFalse(willJump(Processor::processJle, true, false));
-    Assert.assertTrue(willJump(Processor::processJle, false, true));
-    Assert.assertFalse(willJump(Processor::processJle, false, false));
-  }
-
-  @Test
   public void testProcessDjnz() throws ParseException {
     //TODO there is nothing that enforces the second argument to be label
 
@@ -804,7 +780,6 @@ public class ProcessorTest {
       }
     }
 
-    p.processDump();
   }
 
   @Ignore
@@ -812,7 +787,6 @@ public class ProcessorTest {
   public void processDump() {
     Processor processor = new Processor();
     processor.stack[2] = (byte) 0xee;
-    processor.processDump();
   }
 
   @Test

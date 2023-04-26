@@ -77,10 +77,6 @@ public class InstructionUtil {
       case JZ:
       case JE:
       case JNE:
-      case JG:
-      case JGE:
-      case JL:
-      case JLE:
       case JC:
       case JNC:
       case LOOP:
@@ -96,7 +92,6 @@ public class InstructionUtil {
       case NOT:
       case POP:
       case PUSH:
-      case INT:
       case INC:
       case DEC:
         line.append(" ");
@@ -116,7 +111,6 @@ public class InstructionUtil {
       case CLC:
       case SEZ:
       case SEC:
-      case DUMP:
         break;
       default:
         throw new RuntimeException("Command enum had unexpected value");
@@ -135,9 +129,9 @@ public class InstructionUtil {
     if (Processor.isOffsetOperand(instruction, operandIndex)) {
 
       if (instruction[4] < 0) {
-        return operand + Byte.toString(instruction[4]);
+        return operand + instruction[4];
       } else {
-        return operand + "+" + Byte.toString(instruction[4]);
+        return operand + "+" + instruction[4];
       }
 
 
@@ -176,7 +170,7 @@ public class InstructionUtil {
     List<byte[]> instructions = new ArrayList<>();
 
     for (String line : lines) {
-      parseLineForLabels(line, labels, (short) instructions.size());
+      parseLineForLabels(line, labels, (short) 0);
     }
 
     for (String line : lines) {
@@ -304,10 +298,6 @@ public class InstructionUtil {
 
       case JMP:
       case JNZ:
-      case JL:
-      case JLE:
-      case JG:
-      case JGE:
       case JE:
       case JNE:
       case JZ:
@@ -323,7 +313,6 @@ public class InstructionUtil {
       case NOT:
       case POP:
       case PUSH:
-      case INT:
       case INC:
       case DEC:
         instruction = parseSingleOperand(line, labels);
@@ -337,7 +326,6 @@ public class InstructionUtil {
       case CLC:
       case SEZ:
       case SEC:
-      case DUMP:
       case POPA:
       case PUSHA:
         instruction = new byte[1];

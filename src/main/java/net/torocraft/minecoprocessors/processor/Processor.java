@@ -1,13 +1,13 @@
 package net.torocraft.minecoprocessors.processor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagByteArray;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.torocraft.minecoprocessors.Minecoprocessors;
-import net.torocraft.minecoprocessors.gui.GuiMinecoprocessor;
 import net.torocraft.minecoprocessors.util.ByteUtil;
 import net.torocraft.minecoprocessors.util.InstructionUtil;
 import net.torocraft.minecoprocessors.util.Label;
@@ -87,22 +87,7 @@ public class Processor implements IProcessor {
 
   // TODO move to util class
   public static void reset(byte[] a) {
-    for (int i = 0; i < a.length; i++) {
-      a[i] = 0;
-    }
-  }
-
-  // TODO move to util class
-  public static void reset(boolean[] a) {
-    for (int i = 0; i < a.length; i++) {
-      a[i] = false;
-    }
-  }
-
-  public static void reset(int[] a) {
-    for (int i = 0; i < a.length; i++) {
-      a[i] = 0;
-    }
+    Arrays.fill(a, (byte) 0);
   }
 
   @Override
@@ -185,24 +170,20 @@ public class Processor implements IProcessor {
     unPackFlags(c.getLong(NBT_FLAGS));
 
     error = c.getString(NBT_ERROR);
-    if (error != null && error.isEmpty()) {
+    if (error.isEmpty()) {
       error = null;
     }
 
     program = new ArrayList<>();
     NBTTagList programTag = (NBTTagList) c.getTag(NBT_PROGRAM);
-    if (programTag != null) {
-      for (NBTBase tag : programTag) {
-        program.add(((NBTTagByteArray) tag).getByteArray());
-      }
+    for (NBTBase tag : programTag) {
+      program.add(((NBTTagByteArray) tag).getByteArray());
     }
 
     labels = new ArrayList<>();
     NBTTagList labelTag = (NBTTagList) c.getTag(NBT_LABELS);
-    if (labelTag != null) {
-      for (NBTBase tag : labelTag) {
-        labels.add(Label.fromNbt((NBTTagCompound) tag));
-      }
+    for (NBTBase tag : labelTag) {
+      labels.add(Label.fromNbt((NBTTagCompound) tag));
     }
   }
 
@@ -305,18 +286,6 @@ public class Processor implements IProcessor {
       case JE:
         processJz();
         return;
-      case JG:
-        processJg();
-        return;
-      case JGE:
-        processJge();
-        return;
-      case JL:
-        processJl();
-        return;
-      case JLE:
-        processJle();
-        return;
       case MOV:
         processMov();
         return;
@@ -324,7 +293,6 @@ public class Processor implements IProcessor {
         processMul();
         return;
       case NOP:
-      case INT:
         return;
       case NOT:
         processNot();
@@ -402,9 +370,6 @@ public class Processor implements IProcessor {
       case SEC:
         processSec();
         break;
-      case DUMP:
-        processDump();
-        break;
       default:
         throw new RuntimeException("InstructionCode enum had unexpected value");
     }
@@ -434,7 +399,7 @@ public class Processor implements IProcessor {
     int a = getVariableOperand(0);
     int b = getVariableOperand(1);
     int z = a + b;
-    testOverflow(z);
+    checkOverflow(z);
     zero = z == 0;
     registers[instruction[1]] = (byte) z;
   }
@@ -471,10 +436,10 @@ public class Processor implements IProcessor {
   }
 
   void processSub() {
-    int a = getVariableOperand(0);
-    int b = getVariableOperand(1);
+    byte a = getVariableOperand(0);
+    byte b = getVariableOperand(1);
     int z = a - b;
-    testOverflow(z);
+    checkOverflow(z);
     zero = z == 0;
     registers[instruction[1]] = (byte) z;
   }
@@ -483,18 +448,10 @@ public class Processor implements IProcessor {
     int a = getVariableOperand(0);
     int b = getVariableOperand(1);
     int z = a - b;
-    testOverflow(z);
+    checkOverflow(z);
 
-    if (a > b) {
-      zero = false;
-      carry = false;
-    } else if (a < b) {
-      zero = false;
-      carry = true;
-    } else if (a == b) {
-      zero = true;
-      carry = false;
-    }
+    zero  = a == b;
+    carry = a <  b;
   }
 
   void processShl() {
@@ -596,30 +553,6 @@ public class Processor implements IProcessor {
     }
   }
 
-  void processJg() {
-    if (!carry && !zero) {
-      processJmp();
-    }
-  }
-
-  void processJge() {
-    if ((!carry && !zero) || (!carry && zero)) {
-      processJmp();
-    }
-  }
-
-  void processJl() {
-    if (carry && !zero) {
-      processJmp();
-    }
-  }
-
-  void processJle() {
-    if ((carry && zero) || (!carry && zero)) {
-      processJmp();
-    }
-  }
-
   void processDjnz() {
     processDec();
     byte tmp = instruction[1];
@@ -707,7 +640,7 @@ public class Processor implements IProcessor {
     registers[instruction[1]] = (byte) z;
   }
 
-  void testOverflow(long z) {
+  void checkOverflow(long z) {
     overflow = z != (byte) z;
   }
 
@@ -716,7 +649,7 @@ public class Processor implements IProcessor {
     int b = getVariableOperand(0);
     long z = a * b;
     zero = z == 0;
-    testOverflow(z);
+    checkOverflow(z);
     registers[Register.A.ordinal()] = (byte) z;
   }
 
@@ -730,77 +663,8 @@ public class Processor implements IProcessor {
     }
     long z = a / b;
     zero = z == 0;
-    testOverflow(z);
+    checkOverflow(z);
     registers[Register.A.ordinal()] = (byte) z;
-  }
-
-  void processDump() {
-    System.out.println(coreDump());
-  }
-
-  public String coreDump() {
-    StringBuilder s = new StringBuilder();
-
-    s.append("Redstone Processor:\n\n");
-
-    s.append(" a  b  c  d    pf pb pl pr\n");
-    s.append(" ");
-    dumpRegister(s, Register.A);
-    s.append(" ");
-    dumpRegister(s, Register.B);
-    s.append(" ");
-    dumpRegister(s, Register.C);
-    s.append(" ");
-    dumpRegister(s, Register.D);
-    s.append("   ");
-    dumpRegister(s, Register.PF);
-    s.append(" ");
-    dumpRegister(s, Register.PB);
-    s.append(" ");
-    dumpRegister(s, Register.PL);
-    s.append(" ");
-    dumpRegister(s, Register.PR);
-    s.append("\n\n");
-
-    s.append(" ports  adc    ZF CF F  S\n");
-    s.append(" ");
-    dumpRegister(s, Register.PORTS);
-    s.append("     ");
-    dumpRegister(s, Register.ADC);
-
-    s.append("     ");
-    dumpFlag(s, zero);
-    s.append(" ");
-    dumpFlag(s, carry);
-    s.append(" ");
-    dumpFlag(s, fault);
-    s.append(" ");
-    dumpFlag(s, wait);
-    s.append("\n\n");
-
-    s.append(" fault code: ");
-    s.append(" ");
-    s.append(faultCode);
-    s.append("\n\n");
-
-    s.append(" memory\n");
-    for (int i = 0; i < 8; i++) {
-      for (int j = 0; j < 8; j++) {
-        s.append(" ");
-        s.append(GuiMinecoprocessor.toHex(stack[(i * 8) + j]));
-      }
-      s.append("\n");
-    }
-
-    return s.toString();
-  }
-
-  private void dumpRegister(StringBuilder s, Register reg) {
-    s.append(fix(pad(Integer.toUnsignedString(registers[reg.ordinal()], 16))));
-  }
-
-  private static void dumpFlag(StringBuilder s, boolean flag) {
-    s.append(flag ? "1 " : "0 ");
   }
 
   byte getVariableOperand(int operandIndex) {
@@ -866,20 +730,6 @@ public class Processor implements IProcessor {
     return fault;
   }
 
-  private static String pad(String s) {
-    if (s.length() == 1) {
-      return "0" + s;
-    }
-    return s;
-  }
-
-  private static String fix(String s) {
-    if (s.length() > 2) {
-      return s.substring(s.length() - 2, s.length());
-    }
-    return s;
-  }
-
   @Override
   public byte[] getRegisters() {
     return registers;
@@ -891,10 +741,6 @@ public class Processor implements IProcessor {
 
   public short getIp() {
     return ip;
-  }
-
-  public byte getSp() {
-    return sp;
   }
 
   public boolean isZero() {

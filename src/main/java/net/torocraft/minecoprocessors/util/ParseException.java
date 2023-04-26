@@ -10,18 +10,18 @@ public class ParseException extends Exception {
   public int pageNumber;
 
   public ParseException(String line, String message) {
-    super(genMessage(line, message));
+    super(genMessage(line));
     this.line = line;
     this.message = message;
   }
 
   public ParseException(String line, String message, Throwable cause) {
-    super(genMessage(line, message), cause);
+    super(genMessage(line), cause);
     this.line = line;
     this.message = message;
   }
 
-  private static String genMessage(String line, String message) {
+  private static String genMessage(String line) {
     return line;
   }
 

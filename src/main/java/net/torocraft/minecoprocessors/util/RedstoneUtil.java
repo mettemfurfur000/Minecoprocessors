@@ -3,8 +3,6 @@ package net.torocraft.minecoprocessors.util;
 import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
 
 public class RedstoneUtil {
 
@@ -69,10 +67,6 @@ public class RedstoneUtil {
 
   public static boolean isRightPort(IBlockState blockState, EnumFacing side) {
     return blockState.getValue(BlockHorizontal.FACING).rotateY() == side;
-  }
-
-  public static BlockPos getFrontBlock(IBlockAccess blockAccess, BlockPos pos) {
-    return pos.offset(blockAccess.getBlockState(pos).getValue(BlockHorizontal.FACING));
   }
 
 }

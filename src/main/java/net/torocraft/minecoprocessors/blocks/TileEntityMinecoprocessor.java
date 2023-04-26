@@ -2,10 +2,8 @@ package net.torocraft.minecoprocessors.blocks;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+
+import java.util.*;
 import java.util.regex.Pattern;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -48,7 +46,7 @@ public class TileEntityMinecoprocessor extends TileEntity implements ITickable, 
   private String customName;
   private int loadTime;
   private boolean loaded;
-  private Set<EntityPlayerMP> playersToUpdate = new HashSet<>();
+  private final Set<EntityPlayerMP> playersToUpdate = new HashSet<>();
 
   private final byte[] prevPortValues = new byte[4];
   private byte prevPortsRegister = 0x0f;
@@ -117,13 +115,7 @@ public class TileEntityMinecoprocessor extends TileEntity implements ITickable, 
       int priority = -1;
       world.updateBlockTick(pos, BlockMinecoprocessor.INSTANCE, 0, priority);
     }
-/*
-    if (prevIsHot != processor.isHot()) {
-      prevIsHot = processor.isHot();
-      int priority = -1;
-      world.updateBlockTick(pos, BlockMinecoprocessor.INSTANCE, 0, priority);
-    }
-*/
+
     if (!loaded) {
       Processor.reset(prevPortValues);
       prevPortsRegister = 0x0f;
@@ -155,7 +147,7 @@ public class TileEntityMinecoprocessor extends TileEntity implements ITickable, 
     detectOutputChange(3);
   }
 
-  private boolean detectOutputChange(int portIndex) {
+  private void detectOutputChange(int portIndex) {
     byte[] registers = processor.getRegisters();
     byte ports = registers[Register.PORTS.ordinal()];
 
@@ -164,12 +156,10 @@ public class TileEntityMinecoprocessor extends TileEntity implements ITickable, 
     if (isInOutputMode(ports, portIndex) && prevPortValues[portIndex] != curVal) {
       prevPortValues[portIndex] = curVal;
       BlockMinecoprocessor.INSTANCE.onPortChange(world, pos, world.getBlockState(pos), portIndex);
-      return true;
     }
-    return false;
   }
 
-  public boolean updateInputPorts(int[] values) {
+  public void updateInputPorts(int[] values) {
     boolean updated = false;
     for (int i = 0; i < 4; i++) {
       updated = updateInputPort(i, values[i]) || updated;
@@ -177,7 +167,6 @@ public class TileEntityMinecoprocessor extends TileEntity implements ITickable, 
     if (updated) {
       processor.wake();
     }
-    return updated;
   }
 
   public static boolean isInInputMode(byte ports, int portIndex) {
@@ -317,9 +306,7 @@ public class TileEntityMinecoprocessor extends TileEntity implements ITickable, 
   }
 
   private static void addLines(List<String> lines, String toAdd) {
-    for (String s : toAdd.split("\\n\\r?")) {
-      lines.add(s);
-    }
+    lines.addAll(Arrays.asList(toAdd.split("\\n\\r?")));
   }
 
   private void loadBook(ItemStack stack) {
@@ -331,11 +318,8 @@ public class TileEntityMinecoprocessor extends TileEntity implements ITickable, 
       return;
     }
 
+    assert stack.getTagCompound() != null;
     NBTTagList pages = stack.getTagCompound().getTagList("pages", 8);
-
-    if (pages == null) {
-      return;
-    }
 
     boolean signed = stack.getTagCompound().hasKey("author");
     JsonParser parser = null;

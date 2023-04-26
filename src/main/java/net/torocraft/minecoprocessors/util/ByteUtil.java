@@ -3,7 +3,7 @@ package net.torocraft.minecoprocessors.util;
 public class ByteUtil {
 
   public static boolean getBit(long l, int position) {
-    return (l & 1 << position) != 0;
+    return (l & 1L << position) != 0;
   }
 
   public static byte setBit(byte b, boolean bit, int position) {
@@ -15,9 +15,9 @@ public class ByteUtil {
 
   public static long setBit(long l, boolean bit, int position) {
     if (bit) {
-      return l | 1 << position;
+      return l | 1L << position;
     }
-    return l & ~(1 << position);
+    return l & ~(1L << position);
   }
 
   public static byte getByte(long l, int position) {
