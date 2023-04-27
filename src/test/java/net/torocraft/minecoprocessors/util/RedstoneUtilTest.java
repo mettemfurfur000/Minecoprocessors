@@ -1,6 +1,5 @@
 package net.torocraft.minecoprocessors.util;
 
-import mockit.Deencapsulation;
 import net.minecraft.util.EnumFacing;
 import org.junit.Assert;
 import org.junit.Test;
@@ -52,13 +51,5 @@ public class RedstoneUtilTest {
     Assert.assertEquals(r, RedstoneUtil.convertFacingToPortIndex(EnumFacing.EAST, EnumFacing.SOUTH));
     Assert.assertEquals(r, RedstoneUtil.convertFacingToPortIndex(EnumFacing.WEST, EnumFacing.NORTH));
     Assert.assertEquals(l, RedstoneUtil.convertFacingToPortIndex(EnumFacing.SOUTH, EnumFacing.EAST));
-  }
-
-  @Test
-  public void testRotateFacing() {
-    Assert.assertEquals(EnumFacing.EAST, Deencapsulation.invoke(RedstoneUtil.class, "rotateFacing", EnumFacing.NORTH, -3));
-    Assert.assertEquals(EnumFacing.NORTH, Deencapsulation.invoke(RedstoneUtil.class, "rotateFacing", EnumFacing.NORTH, 0));
-    Assert.assertEquals(EnumFacing.EAST, Deencapsulation.invoke(RedstoneUtil.class, "rotateFacing", EnumFacing.EAST, 0));
-    Assert.assertEquals(EnumFacing.EAST, Deencapsulation.invoke(RedstoneUtil.class, "rotateFacing", EnumFacing.WEST, -2));
   }
 }

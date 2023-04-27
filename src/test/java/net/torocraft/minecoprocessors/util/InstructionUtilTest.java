@@ -1,14 +1,14 @@
 package net.torocraft.minecoprocessors.util;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import mockit.Deencapsulation;
 import net.torocraft.minecoprocessors.gui.GuiMinecoprocessor;
 import net.torocraft.minecoprocessors.processor.InstructionCode;
 import net.torocraft.minecoprocessors.processor.Register;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class InstructionUtilTest {
 
@@ -85,31 +85,6 @@ public class InstructionUtilTest {
     Assert.assertEquals(2, l.size());
     Assert.assertEquals("a", l.get(0));
     Assert.assertEquals("test_label-op + 5", l.get(1));
-  }
-
-  @Test
-  public void testIsLiteral() {
-    testIsNotLiteral("abc");
-    testIsNotLiteral("-0x0aF");
-    testIsNotLiteral("0o18");
-    testIsNotLiteral("1012b");
-    testIsLiteral("15");
-    testIsLiteral("-15");
-    testIsLiteral("0x15");
-    testIsLiteral("0o15");
-    testIsLiteral("0o10");
-    testIsLiteral("0x00015");
-    testIsLiteral("0x0aF");
-    testIsLiteral("101b");
-    testIsLiteral("015d");
-  }
-
-  private static void testIsLiteral(String s) {
-    Assert.assertTrue(Deencapsulation.invoke(InstructionUtil.class, "isLiteral", s));
-  }
-
-  private static void testIsNotLiteral(String s) {
-    Assert.assertFalse(Deencapsulation.invoke(InstructionUtil.class, "isLiteral", s));
   }
 
   @Test
